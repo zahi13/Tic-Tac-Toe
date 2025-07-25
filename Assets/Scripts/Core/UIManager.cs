@@ -59,6 +59,7 @@ namespace PlayPerfect.UI
                 var coordinates = cell.GetCoordinates();
                 if (coordinates.Item1 != row || coordinates.Item2 != column) continue;
                 cell.UpdateSprite(symbol == "X" ? _xSprite : _oSprite);
+                cell.ToggleInteraction(false);
                 break;
             }
         }

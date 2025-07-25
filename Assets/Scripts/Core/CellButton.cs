@@ -19,11 +19,7 @@ namespace PlayPerfect.UI
             {
                 _button = button;
                 _button.onClick.RemoveAllListeners();
-                _button.onClick.AddListener(() =>
-                {
-                    ToggleInteraction(false);
-                    onCellClickedCallback?.Invoke(this);
-                });
+                _button.onClick.AddListener(() => onCellClickedCallback?.Invoke(this));
             }
 
             if (TryGetComponent(out Image image))
