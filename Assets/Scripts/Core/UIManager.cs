@@ -21,23 +21,13 @@ namespace PlayPerfect.UI
         [Header("Cells")]
         [SerializeField] CellButton[] _cellButtons; 
         
-        Action<int, int> _onCellClickedCallback;
-        Action _onReplayButtonClickEvent;
-        
         const string SPRITES_ASSETS_PATH = "GraphicAssets"; 
-        const string X_SPRITE_ASSET_NAME = "X"; 
-        const string O_SPRITE_ASSET_NAME = "O"; 
-        const string GRID_SPRITE_ASSET_NAME = "Grid"; 
+
         Sprite _xSprite;
         Sprite _oSprite;
         public bool IsLoadingAssetsCompleted { get; private set; }
 
-        void Start()
-        {
-            _replayButton.onClick.RemoveAllListeners();;
-            _replayButton.onClick.AddListener(OnReplayButtonClicked);
-            _replayButton.gameObject.SetActive(false);
-        }
+        IGameManager _gameManager;
         
         public async UniTask LoadSpritesAsync()
         {
@@ -55,52 +45,57 @@ namespace PlayPerfect.UI
             {
                 switch (sprite.name)
                 {
-                    case X_SPRITE_ASSET_NAME:
+                    case AssetsNames.X_SPRITE_ASSET_NAME:
                         _xSprite = sprite;
                         break;
-                    case O_SPRITE_ASSET_NAME:
+                    case AssetsNames.O_SPRITE_ASSET_NAME:
                         _oSprite = sprite;
                         break;
-                    case GRID_SPRITE_ASSET_NAME:
+                    case AssetsNames.GRID_SPRITE_ASSET_NAME:
                         _gridBackgroundImage.sprite = sprite;
                         break;
                 }
             }
 
             if (_xSprite == null || _oSprite == null)
-                Debug.LogError($"Failed to locate {X_SPRITE_ASSET_NAME} or {O_SPRITE_ASSET_NAME} sprites in the sprite sheet.");
+                Debug.LogError($"Failed to locate {AssetsNames.X_SPRITE_ASSET_NAME} or {AssetsNames.O_SPRITE_ASSET_NAME} sprites in the sprite sheet.");
             else
                 IsLoadingAssetsCompleted = true;
         }
 
-        public void Initialize(Action onReplayButtonClickCallback, Action<int, int> onCellClickedCallback)
+        public void Initialize(IGameManager gameManager, Action onReplayButtonClickCallback, Action<int, int> onCellClickedCallback)
         {
-            _onReplayButtonClickEvent = onReplayButtonClickCallback;
-            _onCellClickedCallback = onCellClickedCallback;
+            _gameManager = gameManager;
 
             for (var index = 0; index < _cellButtons.Length; index++)
             {
                 var row = index / 3;     // 0, 1, 2
                 var column = index % 3;  // 0, 1, 2
                 var cell = _cellButtons[index];
-                cell.Initialize(row, column, HandleCellClicked);
+                cell.Initialize(row, column, cellButton =>
+                {
+                    var (row, column) = cellButton.GetCoordinates();
+                    onCellClickedCallback?.Invoke(row, column);
+                });
                 cell.name = $"CellButton_({row},{column})";
             }
+            
+            _replayButton.onClick.RemoveAllListeners();;
+            _replayButton.onClick.AddListener(() =>
+            {
+                _replayButton.gameObject.SetActive(false);
+                onReplayButtonClickCallback?.Invoke();
+            });
+            _replayButton.gameObject.SetActive(false);
         }
         
-        void HandleCellClicked(CellButton cellButton)
-        {
-            var coordinates = cellButton.GetCoordinates();
-            _onCellClickedCallback?.Invoke(coordinates.Item1, coordinates.Item2);
-        }
-
         public void UpdateCellVisual(int row, int column, string symbol)
         {
             foreach (var cell in _cellButtons)
             {
-                var coordinates = cell.GetCoordinates();
-                if (coordinates.Item1 != row || coordinates.Item2 != column) continue;
-                cell.UpdateSprite(symbol == X_SPRITE_ASSET_NAME ? _xSprite : _oSprite);
+                var (rowIndex, columnIndex) = cell.GetCoordinates();
+                if (row != rowIndex || column != columnIndex) continue;
+                cell.UpdateSprite(symbol == AssetsNames.X_SPRITE_ASSET_NAME ? _xSprite : _oSprite);
                 cell.ToggleInteraction(false);
                 break;
             }
@@ -124,22 +119,31 @@ namespace PlayPerfect.UI
         {
             _turnText.text = isPlayerTurn ? "Your Turn" : "Computer's Turn";
         }
-        
-        public void ShowGameOver()
+
+        public void OnGameOverHandler()
         {
             _replayButton.gameObject.SetActive(true);
+
+            var finalScore = _gameManager.GetFinalScore();
+            UpdateScore(finalScore,0);
+            ToggleCellsInteraction(false);
+            // UpdateGameResultText(_gameManager.IsGameInProgress);
+            _turnText.text = string.Empty;
         }
 
-        void OnReplayButtonClicked()
-        {
-            _replayButton.gameObject.SetActive(false);
-            _onReplayButtonClickEvent.Invoke();
-        }
-
-        public void ToggleCellsInteraction(bool state)
+        void ToggleCellsInteraction(bool state)
         {
             foreach (var cell in _cellButtons)
                 cell.ToggleInteraction(state);
+        }
+        
+        public void ToggleEmptyCellsInteraction(bool enable, int[,] board)
+        {
+            foreach (var cell in _cellButtons)
+            {
+                var (row, column) = cell.GetCoordinates();
+                cell.ToggleInteraction(enable && board[row, column] == 0);
+            }
         }
 
         public void UpdateGameResultText(GameManager.GameResult result)
@@ -153,5 +157,12 @@ namespace PlayPerfect.UI
                 _ => throw new ArgumentOutOfRangeException(nameof(result), result, null)
             };
         }
+    }
+    
+    public class AssetsNames
+    {
+        public const string X_SPRITE_ASSET_NAME = "X"; 
+        public const string O_SPRITE_ASSET_NAME = "O"; 
+        public const string GRID_SPRITE_ASSET_NAME = "Grid"; 
     }
 }

@@ -12,27 +12,36 @@ namespace PlayPerfect.Core
         readonly int[,] _board = new int[3, 3];
 
         readonly UIManager _uiManager;
-        int _finalScore;
 
         DateTime _gameStartTime;
         bool _isPlayerTurn;
         bool _waitingForPlayerTurn;
 
         public enum GameResult { None, Win, Lose, Tie }
-        GameResult _result = GameResult.None;
+        public GameResult Result { get; private set; } = GameResult.None;
 
         public GameManager(UIManager uiManager)
         {
             _uiManager = uiManager;
-            OnGameOver += uiManager.ShowGameOver;
+            OnGameOver += uiManager.OnGameOverHandler;
 
-            uiManager.Initialize(ReplayGame, CellClicked);
+            uiManager.Initialize(this, ReplayGame, CellClicked);
         }
 
         public event Action OnGameOver;
 
         public bool IsGameInProgress { get; private set; }
 
+        public async void Initialize()
+        {
+            await LoadNewGameAsync();
+        }
+
+        async void ReplayGame()
+        {
+            await LoadNewGameAsync();
+        }
+        
         public async UniTask LoadNewGameAsync(bool? isUserFirstTurn = null)
         {
             ResetBoard();
@@ -52,29 +61,6 @@ namespace PlayPerfect.Core
             await GameLoop();
         }
 
-        public async UniTask WaitForPlayerTurn()
-        {
-            while (!_waitingForPlayerTurn)
-                await UniTask.Yield();
-
-            _waitingForPlayerTurn = false;
-        }
-
-        public int GetFinalScore()
-        {
-            return _finalScore;
-        }
-
-        public async void Initialize()
-        {
-            await LoadNewGameAsync();
-        }
-
-        async void ReplayGame()
-        {
-            await LoadNewGameAsync();
-        }
-
         async UniTask GameLoop()
         {
             while (IsGameInProgress)
@@ -82,9 +68,16 @@ namespace PlayPerfect.Core
                 _uiManager.UpdateTurnText(_isPlayerTurn);
 
                 if (_isPlayerTurn)
+                {
+                    _uiManager.ToggleEmptyCellsInteraction(true, _board);
                     await WaitForPlayerTurn();
+                }
                 else
-                    await ComputerTurn();
+                {
+                    _uiManager.ToggleEmptyCellsInteraction(false, _board);
+                    await UniTask.Delay(Random.Range(1000, 3000));
+                    MakeRandomComputerMove();
+                }
 
                 if (CheckGameOver())
                 {
@@ -97,10 +90,18 @@ namespace PlayPerfect.Core
             }
         }
 
+        public async UniTask WaitForPlayerTurn()
+        {
+            while (!_waitingForPlayerTurn)
+                await UniTask.Yield();
+
+            _waitingForPlayerTurn = false;
+        }
+        
         void CellClicked(int row, int column)
         {
             if (MakePlayerMove(row, column))
-                _uiManager.UpdateCellVisual(row, column, "X");
+                _uiManager.UpdateCellVisual(row, column, AssetsNames.X_SPRITE_ASSET_NAME);
         }
 
         bool MakePlayerMove(int x, int y)
@@ -111,12 +112,6 @@ namespace PlayPerfect.Core
             _board[x, y] = 1;
             _waitingForPlayerTurn = true;
             return true;
-        }
-
-        async UniTask ComputerTurn()
-        {
-            await UniTask.Delay(Random.Range(500, 1500));
-            MakeRandomComputerMove();
         }
 
         void MakeRandomComputerMove()
@@ -131,7 +126,7 @@ namespace PlayPerfect.Core
 
             var choice = emptyCells[Random.Range(0, emptyCells.Count)];
             _board[choice.Item1, choice.Item2] = 2;
-            _uiManager.UpdateCellVisual(choice.Item1, choice.Item2, "O");
+            _uiManager.UpdateCellVisual(choice.Item1, choice.Item2, AssetsNames.O_SPRITE_ASSET_NAME);
         }
 
         bool CheckGameOver()
@@ -141,12 +136,12 @@ namespace PlayPerfect.Core
             {
                 if (_board[i, 0] != 0 && _board[i, 0] == _board[i, 1] && _board[i, 1] == _board[i, 2])
                 {
-                    _result = _board[i, 0] == 1 ? GameResult.Win : GameResult.Lose;
+                    Result = _board[i, 0] == 1 ? GameResult.Win : GameResult.Lose;
                     return true;
                 }
                 if (_board[0, i] != 0 && _board[0, i] == _board[1, i] && _board[1, i] == _board[2, i])
                 {
-                    _result = _board[0, i] == 1 ? GameResult.Win : GameResult.Lose;
+                    Result = _board[0, i] == 1 ? GameResult.Win : GameResult.Lose;
                     return true;
                 }
             }
@@ -154,12 +149,12 @@ namespace PlayPerfect.Core
             // Check diagonals
             if (_board[0, 0] != 0 && _board[0, 0] == _board[1, 1] && _board[1, 1] == _board[2, 2])
             {
-                _result = _board[0, 0] == 1 ? GameResult.Win : GameResult.Lose;
+                Result = _board[0, 0] == 1 ? GameResult.Win : GameResult.Lose;
                 return true;
             }
             if (_board[0, 2] != 0 && _board[0, 2] == _board[1, 1] && _board[1, 1] == _board[2, 0])
             {
-                _result = _board[0, 2] == 1 ? GameResult.Win : GameResult.Lose;
+                Result = _board[0, 2] == 1 ? GameResult.Win : GameResult.Lose;
                 return true;
             }
 
@@ -173,29 +168,22 @@ namespace PlayPerfect.Core
             }
 
             if (!boardFull) return false;
-            _result = GameResult.Tie;
+            Result = GameResult.Tie;
             return true;
         }
 
         void EndGame()
         {
             IsGameInProgress = false;
-            
-            _finalScore = CalculateScore();
-            _uiManager.UpdateScore(_finalScore,0);
-            _uiManager.ToggleCellsInteraction(false);
-            _uiManager.UpdateGameResultText(_result);
-            
-            _result = GameResult.None;
-  
             OnGameOver?.Invoke();
+            Result = GameResult.None;
         }
-
-        int CalculateScore()
+        
+        public int GetFinalScore()
         {
             float elapsedTime = (float)(DateTime.UtcNow - _gameStartTime).TotalSeconds;
 
-            int score = _result switch
+            int score = Result switch
             {
                 GameResult.Win => CalculateRangedScore(elapsedTime, 50, 100),
                 GameResult.Tie => CalculateRangedScore(elapsedTime, 2, 49),
