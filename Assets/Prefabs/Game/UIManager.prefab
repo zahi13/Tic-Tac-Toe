@@ -163,8 +163,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -25.5, y: 0}
+  m_SizeDelta: {x: -1, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &8844828773959153759
 MonoBehaviour:
@@ -186,8 +186,8 @@ MonoBehaviour:
   m_ChildAlignment: 0
   m_StartCorner: 0
   m_StartAxis: 0
-  m_CellSize: {x: 150, y: 150}
-  m_Spacing: {x: 25, y: 15}
+  m_CellSize: {x: 165, y: 165}
+  m_Spacing: {x: 20, y: 10}
   m_Constraint: 1
   m_ConstraintCount: 3
 --- !u!1 &2123335680647101834
@@ -439,6 +439,7 @@ MonoBehaviour:
   _turnText: {fileID: 4712403708941178653}
   _resultText: {fileID: 2896904036876863377}
   _replayButton: {fileID: 930073919642318767}
+  _gridBackgroundImage: {fileID: 5746172101828473}
   _cellButtons:
   - {fileID: 5158376659124368656}
   - {fileID: 965674787832968140}
@@ -449,8 +450,6 @@ MonoBehaviour:
   - {fileID: 6594238008104592742}
   - {fileID: 2815675942902171586}
   - {fileID: 7259351748277383359}
-  _xSprite: {fileID: -1687144669380700377, guid: f45214dd1fffa1543978e7752a8b6bb0, type: 3}
-  _oSprite: {fileID: 4748470198486955293, guid: f45214dd1fffa1543978e7752a8b6bb0, type: 3}
 --- !u!1 &3759059963109131345
 GameObject:
   m_ObjectHideFlags: 0
@@ -877,7 +876,7 @@ GameObject:
   - component: {fileID: 7218814850611093941}
   - component: {fileID: 5746172101828473}
   m_Layer: 5
-  m_Name: BackgroundImage
+  m_Name: GridBackgroundImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -930,7 +929,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 8891180011573125036, guid: f45214dd1fffa1543978e7752a8b6bb0, type: 3}
+  m_Sprite: {fileID: 0}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1120,6 +1119,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 5537825449868691903}
     m_Modifications:
+    - target: {fileID: 1176393893962268492, guid: f4e957c9ed6d07746b74d72bbae81ec3, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 6379317483300594935, guid: f4e957c9ed6d07746b74d72bbae81ec3, type: 3}
       propertyPath: m_Name
       value: Button (8)
@@ -1233,6 +1236,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 5537825449868691903}
     m_Modifications:
+    - target: {fileID: 1176393893962268492, guid: f4e957c9ed6d07746b74d72bbae81ec3, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 6379317483300594935, guid: f4e957c9ed6d07746b74d72bbae81ec3, type: 3}
       propertyPath: m_Name
       value: Button
@@ -1346,6 +1353,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 5537825449868691903}
     m_Modifications:
+    - target: {fileID: 1176393893962268492, guid: f4e957c9ed6d07746b74d72bbae81ec3, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 6379317483300594935, guid: f4e957c9ed6d07746b74d72bbae81ec3, type: 3}
       propertyPath: m_Name
       value: Button (2)
@@ -1459,6 +1470,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 5537825449868691903}
     m_Modifications:
+    - target: {fileID: 1176393893962268492, guid: f4e957c9ed6d07746b74d72bbae81ec3, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 6379317483300594935, guid: f4e957c9ed6d07746b74d72bbae81ec3, type: 3}
       propertyPath: m_Name
       value: Button (3)
@@ -1572,6 +1587,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 5537825449868691903}
     m_Modifications:
+    - target: {fileID: 1176393893962268492, guid: f4e957c9ed6d07746b74d72bbae81ec3, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 6379317483300594935, guid: f4e957c9ed6d07746b74d72bbae81ec3, type: 3}
       propertyPath: m_Name
       value: Button (6)
@@ -1685,6 +1704,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 5537825449868691903}
     m_Modifications:
+    - target: {fileID: 1176393893962268492, guid: f4e957c9ed6d07746b74d72bbae81ec3, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 6379317483300594935, guid: f4e957c9ed6d07746b74d72bbae81ec3, type: 3}
       propertyPath: m_Name
       value: Button (5)
@@ -1798,6 +1821,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 5537825449868691903}
     m_Modifications:
+    - target: {fileID: 1176393893962268492, guid: f4e957c9ed6d07746b74d72bbae81ec3, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 6379317483300594935, guid: f4e957c9ed6d07746b74d72bbae81ec3, type: 3}
       propertyPath: m_Name
       value: Button (7)
@@ -1911,6 +1938,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 5537825449868691903}
     m_Modifications:
+    - target: {fileID: 1176393893962268492, guid: f4e957c9ed6d07746b74d72bbae81ec3, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 6379317483300594935, guid: f4e957c9ed6d07746b74d72bbae81ec3, type: 3}
       propertyPath: m_Name
       value: Button (4)
@@ -2024,6 +2055,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 5537825449868691903}
     m_Modifications:
+    - target: {fileID: 1176393893962268492, guid: f4e957c9ed6d07746b74d72bbae81ec3, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 6379317483300594935, guid: f4e957c9ed6d07746b74d72bbae81ec3, type: 3}
       propertyPath: m_Name
       value: Button (1)

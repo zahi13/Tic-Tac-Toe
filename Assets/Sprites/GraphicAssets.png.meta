@@ -115,7 +115,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: assets_0
+      name: Grid
       rect:
         serializedVersion: 2
         x: 51
@@ -127,37 +127,37 @@ TextureImporter:
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: caf9edfec11d36b70800000000000000
+      spriteID: e2abd676e5742454eb6eef03a613050d
       internalID: 8891180011573125036
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: assets_1
+      name: X
       rect:
         serializedVersion: 2
         x: 485
         y: 700
-        width: 200
-        height: 200
+        width: 180
+        height: 180
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 7279ed0bcde0698e0800000000000000
+      spriteID: c44c8dedbef5a984fad7264f7835b210
       internalID: -1687144669380700377
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: assets_2
+      name: Diagonal
       rect:
         serializedVersion: 2
         x: 675
@@ -169,58 +169,37 @@ TextureImporter:
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 1519b4a5844aad7d0800000000000000
+      spriteID: 7fc661b3fcf261449a073e7befd33c36
       internalID: -2892819179972619951
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: assets_3
+      name: O
       rect:
         serializedVersion: 2
-        x: 478
-        y: 428
-        width: 200
-        height: 200
+        x: 485
+        y: 430
+        width: 180
+        height: 180
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: d15f75fac74f5e140800000000000000
+      spriteID: ca69e37a752abc742ab1b23485cfb800
       internalID: 4748470198486955293
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: assets_4
-      rect:
-        serializedVersion: 2
-        x: 659
-        y: 523
-        width: 6
-        height: 6
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: d9d34eddfae2ee760800000000000000
-      internalID: 7488974563240590749
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: assets_5
+      name: Line
       rect:
         serializedVersion: 2
         x: 249
@@ -232,9 +211,9 @@ TextureImporter:
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 0286c98ec9a4f4670800000000000000
+      spriteID: 793cb6e3a75670948a8bfe3784ee46b9
       internalID: 8525114657413556256
       vertices: []
       indices: 
@@ -251,12 +230,13 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      assets_0: 8891180011573125036
-      assets_1: -1687144669380700377
-      assets_2: -2892819179972619951
-      assets_3: 4748470198486955293
+      Diagonal: -2892819179972619951
+      GraphicAssets_0: 2009031165
+      Grid: 8891180011573125036
+      Line: 8525114657413556256
+      O: 4748470198486955293
+      X: -1687144669380700377
       assets_4: 7488974563240590749
-      assets_5: 8525114657413556256
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -1,7 +1,11 @@
 using System;
+using System.Linq;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using PlayPerfect.Core;
 using TMPro;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using UnityEngine.UI;
 
 namespace PlayPerfect.UI
@@ -13,22 +17,58 @@ namespace PlayPerfect.UI
         [SerializeField] TMP_Text _turnText;
         [SerializeField] TMP_Text _resultText;
         [SerializeField] Button _replayButton;
+        [SerializeField] Image _gridBackgroundImage;
         
         [Header("Cells")]
         [SerializeField] CellButton[] _cellButtons; 
         
-        [Header("Sprites")]
-        [SerializeField] Sprite _xSprite;
-        [SerializeField] Sprite _oSprite;
-
         Action<int, int> _onCellClickedCallback;
         Action _onReplayButtonClickEvent;
         
+        const string SPRITES_ASSETS_PATH = "GraphicAssets"; 
+        Sprite _xSprite;
+        Sprite _oSprite;
+        public bool IsLoadingAssetsCompleted { get; private set; }
+
         void Start()
         {
             _replayButton.onClick.RemoveAllListeners();;
             _replayButton.onClick.AddListener(OnReplayButtonClicked);
             _replayButton.gameObject.SetActive(false);
+        }
+        
+        public async UniTask LoadSpritesAsync()
+        {
+            IsLoadingAssetsCompleted = false;
+            var loadAssets = Addressables.LoadAssetAsync<Sprite[]>(SPRITES_ASSETS_PATH);
+            var sprites = await loadAssets.ToUniTask();
+
+            if (sprites == null || !sprites.Any())
+            {
+                Debug.LogError("Missing sprites.");
+                return;
+            }
+            
+            foreach (var sprite in sprites)
+            {
+                switch (sprite.name)
+                {
+                    case "X":
+                        _xSprite = sprite;
+                        break;
+                    case "O":
+                        _oSprite = sprite;
+                        break;
+                    case "Grid":
+                        _gridBackgroundImage.sprite = sprite;
+                        break;
+                }
+            }
+
+            if (_xSprite == null || _oSprite == null)
+                Debug.LogError("Failed to locate X or O sprites in the sprite sheet.");
+            else
+                IsLoadingAssetsCompleted = true;
         }
 
         public void Initialize(Action onReplayButtonClickCallback, Action<int, int> onCellClickedCallback)

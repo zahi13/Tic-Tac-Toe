@@ -12,12 +12,19 @@ public class GameInitializer : MonoBehaviour
     [SerializeField] Camera _mainCamera;
     [SerializeField] UIManager _uiManager;
 
-    void Start()
+    async void Start()
     {
         _eventSystem = Instantiate(_eventSystem);
         _mainCamera = Instantiate(_mainCamera);
         _uiManager = Instantiate(_uiManager);
 
+        await _uiManager.LoadSpritesAsync();
+        if (!_uiManager.IsLoadingAssetsCompleted)
+        {
+            Debug.LogError("Sprites failed to load. Cannot start game.");
+            return;
+        }
+        
         new GameManager(_uiManager).Initialize();
 
         Destroy(gameObject);
