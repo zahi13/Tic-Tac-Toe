@@ -25,6 +25,9 @@ namespace PlayPerfect.UI
         Action _onReplayButtonClickEvent;
         
         const string SPRITES_ASSETS_PATH = "GraphicAssets"; 
+        const string X_SPRITE_ASSET_NAME = "X"; 
+        const string O_SPRITE_ASSET_NAME = "O"; 
+        const string GRID_SPRITE_ASSET_NAME = "Grid"; 
         Sprite _xSprite;
         Sprite _oSprite;
         public bool IsLoadingAssetsCompleted { get; private set; }
@@ -52,20 +55,20 @@ namespace PlayPerfect.UI
             {
                 switch (sprite.name)
                 {
-                    case "X":
+                    case X_SPRITE_ASSET_NAME:
                         _xSprite = sprite;
                         break;
-                    case "O":
+                    case O_SPRITE_ASSET_NAME:
                         _oSprite = sprite;
                         break;
-                    case "Grid":
+                    case GRID_SPRITE_ASSET_NAME:
                         _gridBackgroundImage.sprite = sprite;
                         break;
                 }
             }
 
             if (_xSprite == null || _oSprite == null)
-                Debug.LogError("Failed to locate X or O sprites in the sprite sheet.");
+                Debug.LogError($"Failed to locate {X_SPRITE_ASSET_NAME} or {O_SPRITE_ASSET_NAME} sprites in the sprite sheet.");
             else
                 IsLoadingAssetsCompleted = true;
         }
@@ -97,7 +100,7 @@ namespace PlayPerfect.UI
             {
                 var coordinates = cell.GetCoordinates();
                 if (coordinates.Item1 != row || coordinates.Item2 != column) continue;
-                cell.UpdateSprite(symbol == "X" ? _xSprite : _oSprite);
+                cell.UpdateSprite(symbol == X_SPRITE_ASSET_NAME ? _xSprite : _oSprite);
                 cell.ToggleInteraction(false);
                 break;
             }
