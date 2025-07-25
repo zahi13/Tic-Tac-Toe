@@ -27,7 +27,7 @@ namespace PlayPerfect.UI
         Sprite _oSprite;
         public bool IsLoadingAssetsCompleted { get; private set; }
 
-        IGameManager _gameManager;
+        GameManager _gameManager;
         
         public async UniTask LoadSpritesAsync()
         {
@@ -63,7 +63,7 @@ namespace PlayPerfect.UI
                 IsLoadingAssetsCompleted = true;
         }
 
-        public void Initialize(IGameManager gameManager, Action onReplayButtonClickCallback, Action<int, int> onCellClickedCallback)
+        public void Initialize(GameManager gameManager, Action onReplayButtonClickCallback, Action<int, int> onCellClickedCallback)
         {
             _gameManager = gameManager;
 
@@ -127,7 +127,7 @@ namespace PlayPerfect.UI
             var finalScore = _gameManager.GetFinalScore();
             UpdateScore(finalScore,0);
             ToggleCellsInteraction(false);
-            // UpdateGameResultText(_gameManager.IsGameInProgress);
+            UpdateGameResultText(_gameManager.Result);
             _turnText.text = string.Empty;
         }
 

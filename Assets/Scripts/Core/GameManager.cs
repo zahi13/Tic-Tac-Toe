@@ -46,8 +46,9 @@ namespace PlayPerfect.Core
         {
             ResetBoard();
             IsGameInProgress = true;
+            Result = GameResult.None;
+            
             _gameStartTime = DateTime.UtcNow;
-
             _isPlayerTurn = isUserFirstTurn ?? Random.value > 0.5f;
             
             _uiManager.ResetCells();
@@ -176,7 +177,6 @@ namespace PlayPerfect.Core
         {
             IsGameInProgress = false;
             OnGameOver?.Invoke();
-            Result = GameResult.None;
         }
         
         public int GetFinalScore()
