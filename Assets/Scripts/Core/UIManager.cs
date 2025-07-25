@@ -1,4 +1,5 @@
 using System;
+using PlayPerfect.Core;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,6 +11,7 @@ namespace PlayPerfect.UI
         [Header("UI References")]
         [SerializeField] TMP_Text _scoreText;
         [SerializeField] TMP_Text _turnText;
+        [SerializeField] TMP_Text _resultText;
         [SerializeField] Button _replayButton;
         
         [Header("Cells")]
@@ -42,8 +44,6 @@ namespace PlayPerfect.UI
                 cell.Initialize(row, column, HandleCellClicked);
                 cell.name = $"CellButton_({row},{column})";
             }
-
-            ResetCells();
         }
         
         void HandleCellClicked(CellButton cellButton)
@@ -98,6 +98,18 @@ namespace PlayPerfect.UI
         {
             foreach (var cell in _cellButtons)
                 cell.ToggleInteraction(state);
+        }
+
+        public void UpdateGameResultText(GameManager.GameResult result)
+        {
+            _resultText.text = result switch
+            {
+                GameManager.GameResult.None => string.Empty,
+                GameManager.GameResult.Win => "You Won!",
+                GameManager.GameResult.Lose => "You Lost!",
+                GameManager.GameResult.Tie => "It's a Tie!",
+                _ => throw new ArgumentOutOfRangeException(nameof(result), result, null)
+            };
         }
     }
 }

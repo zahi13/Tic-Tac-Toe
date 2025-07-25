@@ -12,7 +12,6 @@ public class GameInitializer : MonoBehaviour
     [SerializeField] Camera _mainCamera;
     [SerializeField] UIManager _uiManager;
 
-    
     void Start()
     {
         _eventSystem = Instantiate(_eventSystem);
