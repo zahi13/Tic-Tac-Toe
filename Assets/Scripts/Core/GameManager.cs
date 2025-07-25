@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using Cysharp.Threading.Tasks.Triggers;
 using PlayPerfect.UI;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -11,7 +10,6 @@ namespace PlayPerfect.Core
     public class GameManager
     {
         readonly int[,] _board = new int[3, 3];
-        int _finalScore;
 
         DateTime _gameStartTime;
         bool _isGameActive;
@@ -43,7 +41,6 @@ namespace PlayPerfect.Core
         {
             ResetBoard();
             _isGameActive = true;
-            _finalScore = 0;
             _gameStartTime = DateTime.UtcNow;
 
             _isPlayerTurn = isUserFirstTurn ?? Random.value > 0.5f;
@@ -153,7 +150,9 @@ namespace PlayPerfect.Core
         void EndGame()
         {
             _isGameActive = false;
-            _finalScore = CalculateScore();
+            
+            //TODO: Save score, check against best score
+            var finalScore = CalculateScore();
             _uiManager.ToggleCellsInteraction(false);
             OnGameOver?.Invoke();
         }
@@ -163,11 +162,6 @@ namespace PlayPerfect.Core
             var elapsed = (float)(DateTime.UtcNow - _gameStartTime).TotalSeconds;
             var baseScore = 100 - Mathf.Clamp((int)elapsed, 0, 100);
             return baseScore;
-        }
-
-        public int GetFinalScore()
-        {
-            return _finalScore;
         }
 
         void ResetBoard()
