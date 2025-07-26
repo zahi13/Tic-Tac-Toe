@@ -22,8 +22,6 @@ namespace PlayPerfect.UI
         [Header("Cells")]
         [SerializeField] CellButton[] _cellButtons; 
         
-        const string SPRITES_ASSETS_PATH = "GraphicAssets"; 
-
         Sprite _xSprite;
         Sprite _oSprite;
         public bool IsLoadingAssetsCompleted { get; private set; }
@@ -33,7 +31,7 @@ namespace PlayPerfect.UI
         public async UniTask LoadSpritesAsync()
         {
             IsLoadingAssetsCompleted = false;
-            var loadAssets = Addressables.LoadAssetAsync<Sprite[]>(SPRITES_ASSETS_PATH);
+            var loadAssets = Addressables.LoadAssetAsync<Sprite[]>(AssetsNames.SPRITES_ASSETS_PATH);
             var sprites = await loadAssets.ToUniTask();
 
             if (sprites == null || !sprites.Any())
@@ -202,6 +200,8 @@ namespace PlayPerfect.UI
     
     public class AssetsNames
     {
+        public const string SPRITES_ASSETS_PATH = "GraphicAssets"; 
+
         public const string X_SPRITE_ASSET_NAME = "X"; 
         public const string O_SPRITE_ASSET_NAME = "O"; 
         public const string GRID_SPRITE_ASSET_NAME = "Grid"; 

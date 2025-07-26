@@ -24,40 +24,9 @@ namespace PlayPerfect.Core
         public GameResult Result { get; private set; } = GameResult.None;
         public RowTypesContainer.RowType RowResult { get; private set; } = RowTypesContainer.RowType.None;
         
-        [Serializable]
-        public class GameState
-        {
-            public bool IsGameInProgress;
-            public int[,] Board;
-            public bool IsPlayerTurn;
-            public int TotalScore;
-            public float TotalReactionTime;
-        }
+        public event Action OnGameOver;
 
-        GameState _loadedGameState;
-        const string STORAGE_KEY = "CurrentGame";
-        
-        void SaveGameState()
-        {
-            _bestScore = Math.Max(_bestScore, GetFinalScore());
-            var state = new GameState
-            {
-                IsGameInProgress = IsGameInProgress,
-                Board = _board,
-                IsPlayerTurn = _isPlayerTurn,
-                TotalScore = _bestScore,
-                TotalReactionTime = _totalReactionTime,
-            };
-
-            _storageManager.Save(STORAGE_KEY, state);
-        }
-
-        GameState LoadGameState()
-        {
-            if (!_storageManager.HasKey(STORAGE_KEY)) return null;
-            var savedState = _storageManager.Load(STORAGE_KEY);
-            return savedState;
-        }
+        public bool IsGameInProgress { get; private set; }
 
         public GameManager(UIManager uiManager, StorageManager<GameState> storageManager)
         {
@@ -70,10 +39,6 @@ namespace PlayPerfect.Core
             ApplicationEventsHandler.OnApplicationPauseEvent += _ => SaveGameState();
             ApplicationEventsHandler.OnApplicationQuitEvent += SaveGameState;
         }
-        
-        public event Action OnGameOver;
-
-        public bool IsGameInProgress { get; private set; }
 
         public async void Initialize()
         {
@@ -123,7 +88,27 @@ namespace PlayPerfect.Core
             ResetBoard();
             _uiManager.ResetCells();
         }
+        
+        void EndGame()
+        {
+            IsGameInProgress = false;
+            OnGameOver?.Invoke();
+            SaveGameState();
+        }
 
+        public int GetBestScore()
+        {
+            return _bestScore;
+        }
+
+        void ResetBoard()
+        {
+            for (var x = 0; x < 3; x++)
+            for (var y = 0; y < 3; y++)
+                _board[x, y] = 0;
+        }
+        
+        #region Game Logic
         async UniTask GameLoop()
         {
             while (IsGameInProgress)
@@ -254,19 +239,47 @@ namespace PlayPerfect.Core
             Result = GameResult.Tie;
             return true;
         }
-
-        void EndGame()
+        #endregion
+        
+        #region Loading/Saving
+        
+        const string STORAGE_KEY = "CurrentGame";
+        GameState _loadedGameState;
+        
+        [Serializable]
+        public class GameState
         {
-            IsGameInProgress = false;
-            OnGameOver?.Invoke();
-            SaveGameState();
-        }
-
-        public int GetBestScore()
-        {
-            return _bestScore;
+            public bool IsGameInProgress;
+            public int[,] Board;
+            public bool IsPlayerTurn;
+            public int TotalScore;
+            public float TotalReactionTime;
         }
         
+        void SaveGameState()
+        {
+            _bestScore = Math.Max(_bestScore, GetFinalScore());
+            var state = new GameState
+            {
+                IsGameInProgress = IsGameInProgress,
+                Board = _board,
+                IsPlayerTurn = _isPlayerTurn,
+                TotalScore = _bestScore,
+                TotalReactionTime = _totalReactionTime,
+            };
+
+            _storageManager.Save(STORAGE_KEY, state);
+        }
+
+        GameState LoadGameState()
+        {
+            if (!_storageManager.HasKey(STORAGE_KEY)) return null;
+            var savedState = _storageManager.Load(STORAGE_KEY);
+            return savedState;
+        }
+        #endregion
+        
+        #region Scoring
         public int GetFinalScore()
         {
             if (IsGameInProgress) return 0;
@@ -293,12 +306,6 @@ namespace PlayPerfect.Core
             float t = (elapsedTime - 10f) / 10f; // 0 to 1 between 10s and 20s
             return Mathf.RoundToInt(Mathf.Lerp(maxScore, minScore, t));
         }
-
-        void ResetBoard()
-        {
-            for (var x = 0; x < 3; x++)
-            for (var y = 0; y < 3; y++)
-                _board[x, y] = 0;
-        }
+        #endregion
     }
 }
