@@ -1,15 +1,10 @@
-namespace PlayPerfect.SaveSystem
+namespace PlayPerfect.StorageSystem
 {
     public class StorageManager<T>
     {
-        IStorageManager<T> _storageManager;
+        readonly IStorageManager<T> _storageManager;
 
         public StorageManager(IStorageManager<T> storageManager)
-        {
-            _storageManager = storageManager;
-        }
-
-        public void SetStorageManager(IStorageManager<T> storageManager)
         {
             _storageManager = storageManager;
         }

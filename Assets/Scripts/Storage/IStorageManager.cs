@@ -1,4 +1,4 @@
-namespace PlayPerfect.SaveSystem
+namespace PlayPerfect.StorageSystem
 {
     public interface IStorageManager<T>
     {
