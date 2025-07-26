@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices.WindowsRuntime;
 using Cysharp.Threading.Tasks;
 using PlayPerfect.SaveSystem;
 using PlayPerfect.UI;
@@ -15,10 +14,10 @@ namespace PlayPerfect.Core
         readonly StorageManager<GameState> _storageManager;
         
         int[,] _board = new int[3, 3];
-
-        DateTime _gameStartTime;
+        
         bool _isPlayerTurn;
         bool _waitingForPlayerTurn;
+        float _totalReactionTime;
         int _bestScore;
 
         public enum GameResult { None, Win, Lose, Tie }
@@ -31,7 +30,7 @@ namespace PlayPerfect.Core
             public int[,] Board;
             public bool IsPlayerTurn;
             public int TotalScore;
-            public DateTime StartTime;
+            public float TotalReactionTime;
         }
 
         GameState _loadedGameState;
@@ -46,7 +45,7 @@ namespace PlayPerfect.Core
                 Board = _board,
                 IsPlayerTurn = _isPlayerTurn,
                 TotalScore = _bestScore,
-                StartTime = _gameStartTime,
+                TotalReactionTime = _totalReactionTime,
             };
 
             _storageManager.Save(STORAGE_KEY, state);
@@ -102,7 +101,7 @@ namespace PlayPerfect.Core
                 {
                     _board = _loadedGameState.Board;
                     _isPlayerTurn = _loadedGameState.IsPlayerTurn;
-                    _gameStartTime = _loadedGameState.StartTime;
+                    _totalReactionTime = _loadedGameState.TotalReactionTime;
                     
                     _uiManager.SetBoard(_board);
                 }
@@ -117,7 +116,7 @@ namespace PlayPerfect.Core
 
         void SetNewGame()
         {
-            _gameStartTime = DateTime.UtcNow;
+            _totalReactionTime = 0f;
             _isPlayerTurn = Random.value > 0.5f;
             ResetBoard();
             _uiManager.ResetCells();
@@ -154,10 +153,14 @@ namespace PlayPerfect.Core
 
         public async UniTask WaitForPlayerTurn()
         {
+            var turnStartTime = DateTime.UtcNow;
             while (!_waitingForPlayerTurn)
                 await UniTask.Yield();
 
+            var turnReactionTime = (float)(DateTime.UtcNow - turnStartTime).TotalSeconds;
+            _totalReactionTime += turnReactionTime;
             _waitingForPlayerTurn = false;
+            Debug.Log($"Turn Reaction Time = {turnReactionTime} | Total Reaction Time = {_totalReactionTime}");
         }
         
         void CellClicked(int row, int column)
@@ -250,8 +253,7 @@ namespace PlayPerfect.Core
         {
             if (IsGameInProgress) return 0;
             
-            float elapsedTime = (float)(DateTime.UtcNow - _gameStartTime).TotalSeconds;
-
+            var elapsedTime = _totalReactionTime;
             int score = Result switch
             {
                 GameResult.Win => CalculateRangedScore(elapsedTime, 50, 100),
