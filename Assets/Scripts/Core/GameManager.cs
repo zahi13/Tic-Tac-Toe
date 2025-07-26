@@ -22,6 +22,7 @@ namespace PlayPerfect.Core
 
         public enum GameResult { None, Win, Lose, Tie }
         public GameResult Result { get; private set; } = GameResult.None;
+        public RowTypesContainer.RowType RowResult { get; private set; } = RowTypesContainer.RowType.None;
         
         [Serializable]
         public class GameState
@@ -92,6 +93,7 @@ namespace PlayPerfect.Core
         {
             IsGameInProgress = true;
             Result = GameResult.None;
+            RowResult = RowTypesContainer.RowType.None;
             
             if (isUserFirstTurn == null)
                 SetNewGame();
@@ -202,11 +204,25 @@ namespace PlayPerfect.Core
                 if (_board[i, 0] != 0 && _board[i, 0] == _board[i, 1] && _board[i, 1] == _board[i, 2])
                 {
                     Result = _board[i, 0] == 1 ? GameResult.Win : GameResult.Lose;
+                    RowResult = i switch
+                    {
+                        0 => RowTypesContainer.RowType.HorizontalTop,
+                        1 => RowTypesContainer.RowType.HorizontalMiddle,
+                        2 => RowTypesContainer.RowType.HorizontalBottom,
+                        _ => RowResult
+                    };
                     return true;
                 }
                 if (_board[0, i] != 0 && _board[0, i] == _board[1, i] && _board[1, i] == _board[2, i])
                 {
                     Result = _board[0, i] == 1 ? GameResult.Win : GameResult.Lose;
+                    RowResult = i switch
+                    {
+                        0 => RowTypesContainer.RowType.VerticalLeft,
+                        1 => RowTypesContainer.RowType.VerticalMiddle,
+                        2 => RowTypesContainer.RowType.VerticalRight,
+                        _ => RowResult
+                    };
                     return true;
                 }
             }
@@ -215,11 +231,13 @@ namespace PlayPerfect.Core
             if (_board[0, 0] != 0 && _board[0, 0] == _board[1, 1] && _board[1, 1] == _board[2, 2])
             {
                 Result = _board[0, 0] == 1 ? GameResult.Win : GameResult.Lose;
+                RowResult = RowTypesContainer.RowType.ForwardSlash;
                 return true;
             }
             if (_board[0, 2] != 0 && _board[0, 2] == _board[1, 1] && _board[1, 1] == _board[2, 0])
             {
                 Result = _board[0, 2] == 1 ? GameResult.Win : GameResult.Lose;
+                RowResult = RowTypesContainer.RowType.BackwardSlash;
                 return true;
             }
 

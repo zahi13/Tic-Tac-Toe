@@ -17,6 +17,7 @@ namespace PlayPerfect.UI
         [SerializeField] TMP_Text _resultText;
         [SerializeField] Button _replayButton;
         [SerializeField] Image _gridBackgroundImage;
+        [SerializeField] RowTypesContainer _rowTypesContainer;
         
         [Header("Cells")]
         [SerializeField] CellButton[] _cellButtons; 
@@ -40,7 +41,8 @@ namespace PlayPerfect.UI
                 Debug.LogError("Missing sprites.");
                 return;
             }
-            
+
+            Sprite rowSprite = null, diagonalRowSprite = null;
             foreach (var sprite in sprites)
             {
                 switch (sprite.name)
@@ -54,13 +56,21 @@ namespace PlayPerfect.UI
                     case AssetsNames.GRID_SPRITE_ASSET_NAME:
                         _gridBackgroundImage.sprite = sprite;
                         break;
+                    case AssetsNames.ROW_SPRITE_ASSET_NAME:
+                        rowSprite = sprite;
+                        break;
+                    case AssetsNames.DIAGONAL_ROW_SPRITE_ASSET_NAME:
+                        diagonalRowSprite = sprite;
+                        break;
+                    
+                    default:
+                        Debug.LogError($"No match for sprite named {sprite.name}.");
+                        break;
                 }
             }
 
-            if (_xSprite == null || _oSprite == null)
-                Debug.LogError($"Failed to locate {AssetsNames.X_SPRITE_ASSET_NAME} or {AssetsNames.O_SPRITE_ASSET_NAME} sprites in the sprite sheet.");
-            else
-                IsLoadingAssetsCompleted = true;
+            _rowTypesContainer.SetSprites(rowSprite, diagonalRowSprite);
+            IsLoadingAssetsCompleted = true;
         }
 
         public void Initialize(GameManager gameManager, Action onReplayButtonClickCallback, Action<int, int> onCellClickedCallback)
@@ -116,6 +126,8 @@ namespace PlayPerfect.UI
                 cell.UpdateSprite(null);
                 cell.ToggleInteraction(true);
             }
+            
+            _rowTypesContainer.Reset();
         }
 
         public void UpdateScore(int score, int bestScore)
@@ -138,6 +150,7 @@ namespace PlayPerfect.UI
             UpdateScore(finalScore, bestScore);
             ToggleCellsInteraction(false);
             UpdateGameResultText(_gameManager.Result);
+            _rowTypesContainer.ActivateRowType(_gameManager.RowResult);
             _turnText.text = string.Empty;
         }
 
@@ -175,18 +188,13 @@ namespace PlayPerfect.UI
             {
                 var symbol = string.Empty;
                 var symbolIndex = board[row, column];
-                switch (symbolIndex)
+                symbol = symbolIndex switch
                 {
-                    case 0:
-                        symbol = null;
-                        break;
-                    case 1:
-                        symbol = AssetsNames.X_SPRITE_ASSET_NAME;
-                        break;
-                    case 2:
-                        symbol = AssetsNames.O_SPRITE_ASSET_NAME;
-                        break;
-                }
+                    0 => null,
+                    1 => AssetsNames.X_SPRITE_ASSET_NAME,
+                    2 => AssetsNames.O_SPRITE_ASSET_NAME,
+                    _ => symbol
+                };
                 UpdateCellVisual(row, column, symbol);
             }
         }
@@ -197,5 +205,7 @@ namespace PlayPerfect.UI
         public const string X_SPRITE_ASSET_NAME = "X"; 
         public const string O_SPRITE_ASSET_NAME = "O"; 
         public const string GRID_SPRITE_ASSET_NAME = "Grid"; 
+        public const string ROW_SPRITE_ASSET_NAME = "Row"; 
+        public const string DIAGONAL_ROW_SPRITE_ASSET_NAME = "DiagonalRow"; 
     }
 }

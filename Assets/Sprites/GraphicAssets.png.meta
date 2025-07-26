@@ -157,13 +157,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Diagonal
+      name: DiagonalRow
       rect:
         serializedVersion: 2
-        x: 675
-        y: 666
+        x: 652
+        y: 620
         width: 349
-        height: 300
+        height: 358
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -199,15 +199,15 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Line
+      name: Row
       rect:
         serializedVersion: 2
-        x: 249
-        y: 269
-        width: 507
-        height: 111
-      alignment: 9
-      pivot: {x: 0.49777275, y: 0.48256293}
+        x: 300
+        y: 300
+        width: 430
+        height: 35
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -230,11 +230,11 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Diagonal: -2892819179972619951
+      DiagonalRow: -2892819179972619951
       GraphicAssets_0: 2009031165
       Grid: 8891180011573125036
-      Line: 8525114657413556256
       O: 4748470198486955293
+      Row: 8525114657413556256
       X: -1687144669380700377
       assets_4: 7488974563240590749
   mipmapLimitGroupName: 
