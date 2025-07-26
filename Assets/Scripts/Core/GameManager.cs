@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 using Cysharp.Threading.Tasks;
+using PlayPerfect.SaveSystem;
 using PlayPerfect.UI;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -9,32 +11,77 @@ namespace PlayPerfect.Core
 {
     public class GameManager : IGameManager
     {
-        readonly int[,] _board = new int[3, 3];
-
         readonly UIManager _uiManager;
+        readonly StorageManager<GameState> _storageManager;
+        
+        int[,] _board = new int[3, 3];
 
         DateTime _gameStartTime;
         bool _isPlayerTurn;
         bool _waitingForPlayerTurn;
+        int _bestScore;
 
         public enum GameResult { None, Win, Lose, Tie }
         public GameResult Result { get; private set; } = GameResult.None;
-
-        public GameManager(UIManager uiManager)
+        
+        [Serializable]
+        public class GameState
         {
-            _uiManager = uiManager;
-            OnGameOver += uiManager.OnGameOverHandler;
-
-            uiManager.Initialize(this, ReplayGame, CellClicked);
+            public bool IsGameInProgress;
+            public int[,] Board;
+            public bool IsPlayerTurn;
+            public int TotalScore;
+            public DateTime StartTime;
         }
 
+        GameState _loadedGameState;
+        const string STORAGE_KEY = "CurrentGame";
+        
+        void SaveGameState()
+        {
+            _bestScore = Math.Max(_bestScore, GetFinalScore());
+            var state = new GameState
+            {
+                IsGameInProgress = IsGameInProgress,
+                Board = _board,
+                IsPlayerTurn = _isPlayerTurn,
+                TotalScore = _bestScore,
+                StartTime = _gameStartTime,
+            };
+
+            _storageManager.Save(STORAGE_KEY, state);
+        }
+
+        GameState LoadGameState()
+        {
+            if (!_storageManager.HasKey(STORAGE_KEY)) return null;
+            var savedState = _storageManager.Load(STORAGE_KEY);
+            return savedState;
+        }
+
+        public GameManager(UIManager uiManager, StorageManager<GameState> storageManager)
+        {
+            _uiManager = uiManager;
+            _storageManager = storageManager;
+            
+            uiManager.Initialize(this, ReplayGame, CellClicked);
+            OnGameOver += uiManager.OnGameOverHandler;
+            
+            ApplicationEventsHandler.OnApplicationPauseEvent += _ => SaveGameState();
+            ApplicationEventsHandler.OnApplicationQuitEvent += SaveGameState;
+        }
+        
         public event Action OnGameOver;
 
         public bool IsGameInProgress { get; private set; }
 
         public async void Initialize()
         {
-            await LoadNewGameAsync();
+            bool? isUserFirstTurn = null;
+            _loadedGameState = LoadGameState();
+            if (_loadedGameState != null && _loadedGameState.IsGameInProgress)
+                isUserFirstTurn = _loadedGameState.IsPlayerTurn;
+            await LoadNewGameAsync(isUserFirstTurn);
         }
 
         async void ReplayGame()
@@ -44,22 +91,36 @@ namespace PlayPerfect.Core
         
         public async UniTask LoadNewGameAsync(bool? isUserFirstTurn = null)
         {
-            ResetBoard();
             IsGameInProgress = true;
             Result = GameResult.None;
             
-            _gameStartTime = DateTime.UtcNow;
-            _isPlayerTurn = isUserFirstTurn ?? Random.value > 0.5f;
+            if (isUserFirstTurn == null)
+                SetNewGame();
+            if (_loadedGameState != null)
+            {
+                if (_loadedGameState.IsGameInProgress)
+                {
+                    _board = _loadedGameState.Board;
+                    _isPlayerTurn = _loadedGameState.IsPlayerTurn;
+                    _gameStartTime = _loadedGameState.StartTime;
+                    
+                    _uiManager.SetBoard(_board);
+                }
+                _bestScore = Math.Max(_bestScore, _loadedGameState.TotalScore);
+            }
             
-            _uiManager.ResetCells();
             _uiManager.UpdateGameResultText(GameResult.None);
-            
-            // TODO: Load existing game & best score if exist
-            var currentScore = 0;
-            var bestScore = 0;
-            _uiManager.UpdateScore(currentScore, bestScore);
+            _uiManager.UpdateScore(0, _bestScore);
             
             await GameLoop();
+        }
+
+        void SetNewGame()
+        {
+            _gameStartTime = DateTime.UtcNow;
+            _isPlayerTurn = Random.value > 0.5f;
+            ResetBoard();
+            _uiManager.ResetCells();
         }
 
         async UniTask GameLoop()
@@ -177,10 +238,18 @@ namespace PlayPerfect.Core
         {
             IsGameInProgress = false;
             OnGameOver?.Invoke();
+            SaveGameState();
+        }
+
+        public int GetBestScore()
+        {
+            return _bestScore;
         }
         
         public int GetFinalScore()
         {
+            if (IsGameInProgress) return 0;
+            
             float elapsedTime = (float)(DateTime.UtcNow - _gameStartTime).TotalSeconds;
 
             int score = Result switch

@@ -151,6 +151,7 @@ MonoBehaviour:
   _eventSystem: {fileID: 6615576270023964533, guid: d2ae8a9c1d6c598488915e7968a364f5, type: 3}
   _mainCamera: {fileID: 3506393668477361594, guid: 9ceefc3f51beb9d46b91ffe5e48038c0, type: 3}
   _uiManager: {fileID: 1538694905427621692, guid: 8fdfa9132c35a074786e1266c6f73bcc, type: 3}
+  _applicationEventsHandler: {fileID: 6050633237419656690, guid: ae980500d76996e4fb496e4381b99637, type: 3}
 --- !u!4 &1213782725
 Transform:
   m_ObjectHideFlags: 0

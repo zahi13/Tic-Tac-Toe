@@ -95,8 +95,16 @@ namespace PlayPerfect.UI
             {
                 var (rowIndex, columnIndex) = cell.GetCoordinates();
                 if (row != rowIndex || column != columnIndex) continue;
-                cell.UpdateSprite(symbol == AssetsNames.X_SPRITE_ASSET_NAME ? _xSprite : _oSprite);
-                cell.ToggleInteraction(false);
+                if (symbol == null)
+                {
+                    cell.UpdateSprite(null);
+                    cell.ToggleInteraction(true);
+                }
+                else
+                {
+                    cell.UpdateSprite(symbol == AssetsNames.X_SPRITE_ASSET_NAME ? _xSprite : _oSprite);
+                    cell.ToggleInteraction(false);
+                }
                 break;
             }
         }
@@ -125,7 +133,9 @@ namespace PlayPerfect.UI
             _replayButton.gameObject.SetActive(true);
 
             var finalScore = _gameManager.GetFinalScore();
-            UpdateScore(finalScore,0);
+            var bestScore = _gameManager.GetBestScore();
+            bestScore = Math.Max(finalScore, bestScore);
+            UpdateScore(finalScore, bestScore);
             ToggleCellsInteraction(false);
             UpdateGameResultText(_gameManager.Result);
             _turnText.text = string.Empty;
@@ -156,6 +166,29 @@ namespace PlayPerfect.UI
                 GameManager.GameResult.Tie => "It's a Tie!",
                 _ => throw new ArgumentOutOfRangeException(nameof(result), result, null)
             };
+        }
+
+        public void SetBoard(int[,] board)
+        {
+            for (var row = 0; row < board.GetLength(0); row++)
+            for (var column = 0; column < board.GetLength(1); column++)
+            {
+                var symbol = string.Empty;
+                var symbolIndex = board[row, column];
+                switch (symbolIndex)
+                {
+                    case 0:
+                        symbol = null;
+                        break;
+                    case 1:
+                        symbol = AssetsNames.X_SPRITE_ASSET_NAME;
+                        break;
+                    case 2:
+                        symbol = AssetsNames.O_SPRITE_ASSET_NAME;
+                        break;
+                }
+                UpdateCellVisual(row, column, symbol);
+            }
         }
     }
     
